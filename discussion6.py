@@ -3,6 +3,7 @@ import os
 
 
 def load_csv(f):
+    import csv
     '''
     Params: 
         f, name or path or CSV file: string
@@ -14,6 +15,21 @@ def load_csv(f):
     
     Note: Don't strip or otherwise modify strings. Don't change datatypes from strings. 
     '''
+    data = {}
+
+    with open(f, newline='', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if len(row) < 3:
+                continue  # Skip malformed rows
+            year, month, value = row[0], row[1], row[2]
+            
+            if year not in data:
+                data[year] = {}
+            
+            data[year][month] = value  # Keep values as strings
+
+    return data
 
     base_path = os.path.abspath(os.path.dirname(__file__))
     full_path = os.path.join(base_path, f)
@@ -31,6 +47,16 @@ def get_annual_max(d):
     Note: Don't strip or otherwise modify strings. Do not change datatypes except where necessary.
         You'll have to change vals to int to compare them. 
     '''
+    
+    result = []
+
+    for year, months in d.items():
+        max_month = max(months, key=lambda m: int(months[m]))  # Find the month with the max value
+        max_value = int(months[max_month])  # Convert value to int for comparison
+        result.append((year, max_month, max_value))
+
+    return result
+
     pass
 
 def get_month_avg(d):
@@ -45,6 +71,15 @@ def get_month_avg(d):
     Note: Don't strip or otherwise modify strings. Do not change datatypes except where necessary. 
         You'll have to make the vals int or float here and round the avg to pass tests.
     '''
+    result = {}
+
+    for year, months in d.items():
+        values = [int(value) for value in months.values()]  # Convert values to integers
+        avg = round(sum(values) / len(values))  # Compute average and round it
+        result[year] = avg  # Store as rounded int
+
+    return result
+
     pass
 
 class dis7_test(unittest.TestCase):
